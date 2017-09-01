@@ -17,6 +17,8 @@ Usage:
   -s      - Since use git --since param
   -l      - Log used git command
   -n      - No hashs: avoid commit hash in git output
+  -c      - copyformat without age author and hash (very short)
+
 
 Examples:
   git standup -a "John Doe" -w "MON-FRI" -m 3
@@ -40,6 +42,9 @@ function colored() {
   if [[ $option_g ]] ; then
     GIT_PRETTY_FORMAT="$GIT_PRETTY_FORMAT %C(yellow)gpg: %G?%Creset"
   fi
+  if [[ $option_c ]]; then
+      GIT_PRETTY_FORMAT='- %s %Creset'
+  fi
 }
 
 # Sets up the uncolored output
@@ -52,15 +57,23 @@ function uncolored() {
   UNDERLINE=""
   NORMAL=""
   GIT_PRETTY_FORMAT='%h - %s (%cd) <%an>'
+  
+  if [[ $option_n ]] ; then
+    GIT_PRETTY_FORMAT='- %s (%cd) <%an>'
+  fi
 
   if [[ $option_g ]] ; then
     GIT_PRETTY_FORMAT="$GIT_PRETTY_FORMAT gpg: %G?"
   fi
+  
+  if [[ $option_c ]]; then
+      GIT_PRETTY_FORMAT='- %s %Creset'
+  fi
 }
 
-while getopts "hglntd:a:w:m:D:s:" opt; do
+while getopts "hglntcd:a:w:m:D:s:" opt; do
   case $opt in
-    h|d|a|w|m|g|D|s|t|l|n)
+    h|d|a|w|m|g|D|s|t|l|n|c)
       declare "option_$opt=${OPTARG:-0}"
       ;;
     \?)
